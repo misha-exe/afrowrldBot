@@ -72,7 +72,7 @@ cron.schedule('0 * * * *', async () => {
                 parse_mode: 'HTML',
                 reply_markup: {
                     inline_keyboard: [[
-                        { text: "🔞 WATCH NOW 🔞", url: `https://t.me/${bot.botInfo.username}/start` }
+                        { text: "🔞 WATCH NOW 🔞", url: `http://t.me/AfrowrldBot/afrowrld` }
                     ]]
                 }
             });
