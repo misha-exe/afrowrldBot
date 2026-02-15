@@ -65,7 +65,7 @@ cron.schedule('0 * * * *', async () => {
             const vid = response.documents[0];
             const msg = `🚨 <b>NEW VIDEO ALERT</b> 🚨\n\n` +
                         `<b>${vid.title}</b> just dropped!\n\n` +
-                        `👇 Watch before it gets deleted!`;
+                        `👇 Watch Now!`;
 
             // Note: Make sure CHANNEL_ID is set in Render Environment Variables
             await bot.telegram.sendMessage(process.env.CHANNEL_ID, msg, {
