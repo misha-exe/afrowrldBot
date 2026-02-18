@@ -63,8 +63,8 @@ cron.schedule('0 * * * *', async () => {
 
         if (response.documents.length > 0) {
             const vid = response.documents[0];
-            const msg = `🚨 <b>NEW VIDEO ALERT</b> 🚨\n\n` +
-                        `<b>${vid.title}</b> just dropped!\n\n` +
+            const msg = `🚨 <b>NEW AFROWORLD VIDEOS</b> 🚨\n\n` +
+                        `New videos from Afroworld were just posted!\n\n` +
                         `👇 Watch Now!`;
 
             // Note: Make sure CHANNEL_ID is set in Render Environment Variables
