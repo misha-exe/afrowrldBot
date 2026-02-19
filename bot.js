@@ -48,35 +48,47 @@ bot.command('watch', (ctx) => {
     ]));
 });
 
-// --- 4. HOURLY CHECK ---
-cron.schedule('0 * * * *', async () => {
-    console.log('Cron: Checking for new videos...');
+// --- 4. TWO-HOUR CHECK ---
+cron.schedule('0 */2 * * *', async () => { // Runs every 2 hours
+    console.log('Cron: Checking status...');
     try {
-        // Check for videos added in the last 65 minutes
-        const oneHourAgo = new Date(Date.now() - 65 * 60 * 1000).toISOString();
+        // Check time window: 2 hours + 5 mins buffer = 125 minutes
+        const timeWindow = new Date(Date.now() - 125 * 60 * 1000).toISOString();
 
+        // Check if ANY video was uploaded in this window
         const response = await databases.listDocuments(
             DB_ID, 
             COLL_ID, 
-            [ Query.greaterThan('$createdAt', oneHourAgo) ]
+            [ Query.greaterThan('$createdAt', timeWindow) ]
         );
 
-        if (response.documents.length > 0) {
-            const vid = response.documents[0];
-            const msg = `🚨 <b>NEW AFROWORLD VIDEOS</b> 🚨\n\n` +
-                        `New videos from Afroworld were just posted!\n\n` +
-                        `👇 Watch Now!`;
+        let msg = '';
 
-            // Note: Make sure CHANNEL_ID is set in Render Environment Variables
-            await bot.telegram.sendMessage(process.env.CHANNEL_ID, msg, {
-                parse_mode: 'HTML',
-                reply_markup: {
-                    inline_keyboard: [[
-                        { text: "🔞 WATCH NOW 🔞", url: `http://t.me/afrowrld_bot/afrowrld` }
-                    ]]
-                }
-            });
+        if (response.documents.length > 0) {
+            // SCENARIO A: New videos were found
+            msg = `🚨 <b>NEW AFROWORLD VIDEOS</b> 🚨\n\n` +
+                  `New videos from Afroworld were just posted!\n\n` +
+                  `👇 Watch Now!`;
+        } else {
+            // SCENARIO B: No new videos (Engagement message)
+            msg = `🔞 <b>DON’T MISS OUT</b> 🔞\n\n` +
+                  `You may have missed some videos from Afroworld.\n\n` +
+                  `👇 Check them out now!`;
         }
+
+        // Send the message to the channel
+        await bot.telegram.sendMessage(process.env.CHANNEL_ID, msg, {
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+            reply_markup: {
+                inline_keyboard: [[
+                    { text: "🔞 WATCH NOW 🔞", url: `http://t.me/afrowrld_bot/afrowrld` }
+                ]]
+            }
+        });
+        
+        console.log(`Notification sent. New videos found: ${response.documents.length > 0}`);
+
     } catch (error) {
         console.error('Cron Error:', error);
     }
